@@ -1,0 +1,1430 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NERA Windsor — Neuroscience Education & Research Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #050d1a;
+  --deep: #08152a;
+  --panel: #0f1e35;
+  --border: rgba(100,180,255,0.12);
+  --cyan: #00d4ff;
+  --gold: #c9a84c;
+  --white: #e8f0f8;
+  --muted: rgba(232,240,248,0.5);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--navy); color:var(--white); font-family:'Cormorant Garamond',Georgia,serif; overflow-x:hidden; }
+
+#neural-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:0.3; }
+
+/* NAV */
+nav { position:fixed; top:0; width:100%; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:16px 48px; background:rgba(5,13,26,0.9); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); }
+.nav-logo { font-family:'Syne',sans-serif; font-size:1rem; font-weight:800; letter-spacing:0.12em; color:var(--white); text-transform:uppercase; text-decoration:none; }
+.nav-logo span { color:var(--cyan); }
+.nav-links { display:flex; gap:24px; align-items:center; }
+.nav-links a { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.1em; color:var(--muted); text-decoration:none; text-transform:uppercase; transition:color .2s; }
+.nav-links a:hover { color:var(--cyan); }
+.nav-donate { font-family:'DM Mono',monospace; font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase; background:transparent; border:1px solid var(--gold); color:var(--gold); padding:8px 18px; cursor:pointer; transition:all .25s; text-decoration:none; }
+.nav-donate:hover { background:var(--gold); color:var(--navy); }
+
+/* HERO */
+.hero { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; padding:140px 80px 80px; }
+.hero-eyebrow { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.25em; color:var(--cyan); text-transform:uppercase; margin-bottom:22px; opacity:0; animation:fadeUp .8s ease .2s forwards; }
+.hero h1 { font-size:clamp(3rem,6.5vw,6rem); font-weight:300; line-height:1.05; max-width:880px; opacity:0; animation:fadeUp .9s ease .4s forwards; }
+.hero h1 em { font-style:italic; color:var(--cyan); }
+.hero-sub { margin-top:28px; max-width:520px; font-size:1.2rem; font-weight:300; line-height:1.75; color:var(--muted); opacity:0; animation:fadeUp .9s ease .6s forwards; }
+.hero-ctas { margin-top:44px; display:flex; gap:14px; flex-wrap:wrap; opacity:0; animation:fadeUp .9s ease .8s forwards; }
+
+.btn-primary { font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; background:var(--cyan); color:var(--navy); padding:12px 28px; border:none; cursor:pointer; font-weight:500; text-decoration:none; transition:all .25s; display:inline-block; }
+.btn-primary:hover { background:var(--white); }
+.btn-outline { font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; background:transparent; color:var(--white); padding:12px 28px; border:1px solid rgba(232,240,248,0.3); cursor:pointer; text-decoration:none; transition:all .25s; display:inline-block; }
+.btn-outline:hover { border-color:var(--cyan); color:var(--cyan); }
+.btn-gold { font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; background:var(--gold); color:var(--navy); padding:12px 28px; border:none; cursor:pointer; font-weight:500; text-decoration:none; transition:all .25s; display:inline-block; }
+.btn-gold:hover { background:#e0bd6a; }
+
+/* STATS */
+.stats-band { position:relative; z-index:1; display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:rgba(10,22,40,0.7); backdrop-filter:blur(10px); }
+.stat-item { padding:40px 32px; border-right:1px solid var(--border); }
+.stat-item:last-child { border-right:none; }
+.stat-num { font-size:3rem; font-weight:300; color:var(--cyan); line-height:1; }
+.stat-label { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-top:8px; }
+
+/* SECTIONS */
+section { position:relative; z-index:1; }
+.section-inner { max-width:1200px; margin:0 auto; padding:90px 80px; }
+.section-label { font-family:'DM Mono',monospace; font-size:0.63rem; letter-spacing:0.25em; color:var(--cyan); text-transform:uppercase; margin-bottom:16px; display:flex; align-items:center; gap:13px; }
+.section-label::before { content:''; display:block; width:20px; height:1px; background:var(--cyan); }
+h2 { font-size:clamp(2.2rem,3.8vw,3.2rem); font-weight:300; line-height:1.15; margin-bottom:18px; }
+h2 em { font-style:italic; color:var(--cyan); }
+
+/* MISSION */
+.mission-grid { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:start; margin-top:52px; }
+.mission-text { font-size:1.12rem; font-weight:300; line-height:1.8; color:rgba(232,240,248,0.85); }
+.mission-text p+p { margin-top:18px; }
+.pillar { padding:24px 0; border-bottom:1px solid var(--border); }
+.pillar:first-child { border-top:1px solid var(--border); }
+.pillar-num { font-family:'DM Mono',monospace; font-size:0.6rem; color:var(--cyan); letter-spacing:0.15em; margin-bottom:5px; }
+.pillar-title { font-size:1.3rem; font-weight:400; margin-bottom:4px; }
+.pillar-desc { font-size:0.96rem; color:var(--muted); line-height:1.6; }
+
+/* AFFILIATES */
+.affiliates-bar { position:relative; z-index:1; border-top:1px solid var(--border); padding:44px 80px; }
+.affiliates-label { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.2em; color:var(--muted); text-transform:uppercase; margin-bottom:24px; text-align:center; }
+.affiliates-list { display:flex; justify-content:center; align-items:center; gap:48px; flex-wrap:wrap; }
+.affiliate-name { font-size:1.05rem; font-style:italic; color:var(--muted); transition:color .2s; }
+.affiliate-name:hover { color:var(--white); }
+.aff-div { width:1px; height:26px; background:var(--border); }
+
+/* EDU VIDEOS */
+.edu-section { background:var(--deep); border-top:1px solid var(--border); }
+.video-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:3px; margin-top:52px; }
+.video-card { background:var(--panel); position:relative; overflow:hidden; display:block; text-decoration:none; color:var(--white); }
+.video-card img { width:100%; height:210px; object-fit:cover; display:block; transition:transform .4s, filter .4s; filter:brightness(0.75) saturate(0.8); }
+.video-card:hover img { transform:scale(1.04); filter:brightness(0.5) saturate(0.6); }
+.video-card-play { position:absolute; top:50%; left:50%; transform:translate(-50%,-55%); width:52px; height:52px; background:rgba(0,212,255,0.15); border:2px solid var(--cyan); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1rem; color:var(--cyan); opacity:0; transition:opacity .3s; }
+.video-card:hover .video-card-play { opacity:1; }
+.video-card-overlay { position:absolute; bottom:0; left:0; right:0; padding:18px 20px; background:linear-gradient(transparent,rgba(5,13,26,0.95)); }
+.video-card-title { font-size:0.93rem; line-height:1.4; margin-bottom:7px; }
+.video-card-cta { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--cyan); display:inline-flex; align-items:center; gap:5px; }
+.video-card-cta::before { content:'▶'; font-size:0.5rem; }
+
+/* WORKSHOP */
+.workshop-section { position:relative; z-index:1; border-top:1px solid var(--border); }
+.workshop-video-wrap { margin-top:36px; border:1px solid var(--border); overflow:hidden; background:#000; }
+.workshop-video-wrap video { width:100%; display:block; max-height:500px; object-fit:cover; }
+.workshop-gallery { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-top:3px; }
+.workshop-gallery img { width:100%; aspect-ratio:1; object-fit:cover; filter:brightness(0.65) saturate(0.7); transition:all .3s; cursor:pointer; display:block; }
+.workshop-gallery img:hover { filter:brightness(1) saturate(1); }
+
+/* PHYSICIANS */
+.physicians-section { background:var(--deep); border-top:1px solid var(--border); }
+.physicians-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; margin-top:52px; }
+.physician-card { background:var(--panel); overflow:hidden; }
+.physician-card img { width:100%; height:250px; object-fit:cover; object-position:top center; filter:grayscale(25%) brightness(0.85); transition:filter .3s; display:block; }
+.physician-card:hover img { filter:grayscale(0%) brightness(1); }
+.physician-info { padding:22px 26px 26px; }
+.physician-name { font-size:1.2rem; font-weight:400; margin-bottom:4px; }
+.physician-role { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.1em; color:var(--cyan); text-transform:uppercase; margin-bottom:10px; }
+.physician-bio { font-size:0.92rem; line-height:1.65; color:var(--muted); }
+.neuro-note { margin-top:44px; padding:28px 36px; border:1px solid var(--border); background:rgba(0,212,255,0.03); font-size:1.05rem; line-height:1.7; color:var(--muted); }
+.neuro-note strong { color:var(--white); }
+
+/* AI CHAT */
+.ai-section { border-top:1px solid var(--border); }
+.ai-inner { max-width:1200px; margin:0 auto; padding:90px 80px; display:grid; grid-template-columns:1fr 1.3fr; gap:64px; align-items:start; }
+.ai-intro p { font-size:1.08rem; line-height:1.75; color:var(--muted); margin-bottom:22px; }
+.ai-badge { display:inline-flex; align-items:center; gap:8px; font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; background:rgba(0,212,255,0.07); border:1px solid rgba(0,212,255,0.2); color:var(--cyan); padding:7px 13px; }
+.ai-badge::before { content:''; width:6px; height:6px; background:var(--cyan); border-radius:50%; animation:pd 1.5s infinite; }
+@keyframes pd{0%,100%{opacity:1}50%{opacity:.3}}
+.chat-widget { background:var(--panel); border:1px solid var(--border); display:flex; flex-direction:column; height:500px; overflow:hidden; }
+.chat-header { padding:13px 17px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; background:rgba(0,212,255,0.04); }
+.chat-header-icon { width:28px; height:28px; background:var(--cyan); display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0; }
+.chat-header-text { font-family:'DM Mono',monospace; font-size:0.68rem; letter-spacing:0.05em; }
+.chat-header-text small { display:block; color:var(--muted); font-size:0.58rem; }
+.chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:11px; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+.msg { max-width:87%; font-size:0.93rem; line-height:1.55; padding:10px 14px; animation:mi .3s ease; }
+@keyframes mi{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.msg-ai { background:rgba(0,212,255,0.07); border:1px solid rgba(0,212,255,0.13); border-radius:0 10px 10px 10px; align-self:flex-start; }
+.msg-user { background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.17); border-radius:10px 10px 0 10px; align-self:flex-end; text-align:right; }
+.msg-ai-label { font-family:'DM Mono',monospace; font-size:0.57rem; color:var(--cyan); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:3px; }
+.typing-indicator { display:none; align-items:center; gap:5px; padding:11px 14px; align-self:flex-start; }
+.typing-indicator.active { display:flex; }
+.typing-indicator span { width:5px; height:5px; background:var(--cyan); border-radius:50%; animation:tb 1.2s infinite; }
+.typing-indicator span:nth-child(2){animation-delay:.2s}.typing-indicator span:nth-child(3){animation-delay:.4s}
+@keyframes tb{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+.chat-input-area { padding:11px 13px; border-top:1px solid var(--border); display:flex; gap:8px; background:rgba(5,13,26,0.5); }
+.chat-input { flex:1; background:rgba(232,240,248,0.05); border:1px solid var(--border); color:var(--white); font-family:'Cormorant Garamond',serif; font-size:0.98rem; padding:9px 12px; outline:none; transition:border-color .2s; }
+.chat-input::placeholder { color:var(--muted); font-style:italic; }
+.chat-input:focus { border-color:rgba(0,212,255,0.4); }
+.chat-send { background:var(--cyan); color:var(--navy); border:none; padding:9px 16px; font-family:'DM Mono',monospace; font-size:0.68rem; letter-spacing:0.07em; text-transform:uppercase; cursor:pointer; font-weight:500; transition:background .2s; }
+.chat-send:hover { background:var(--white); }
+.chat-send:disabled { opacity:.4; cursor:not-allowed; }
+.quick-questions { padding:9px 13px 0; display:flex; flex-wrap:wrap; gap:5px; }
+.quick-q { font-family:'DM Mono',monospace; font-size:0.58rem; letter-spacing:0.05em; padding:5px 9px; background:transparent; border:1px solid var(--border); color:var(--muted); cursor:pointer; text-transform:uppercase; transition:all .2s; }
+.quick-q:hover { border-color:var(--cyan); color:var(--cyan); }
+
+/* FELLOWSHIP */
+.fellowship-section { border-top:1px solid var(--border); }
+.fellowship-grid { display:grid; grid-template-columns:1.1fr 1fr; gap:64px; margin-top:52px; }
+.fellowship-card { background:var(--panel); border:1px solid var(--border); padding:32px; position:relative; overflow:hidden; margin-bottom:3px; }
+.fellowship-card::before { content:''; position:absolute; top:0; left:0; width:100%; height:3px; background:linear-gradient(90deg,var(--cyan),transparent); }
+.fellowship-card h3 { font-size:1.45rem; font-weight:400; margin-bottom:13px; }
+.fellowship-card p { font-size:0.98rem; line-height:1.7; color:var(--muted); margin-bottom:18px; }
+.testimonial { padding:26px 0; border-bottom:1px solid var(--border); }
+.testimonial:first-child { border-top:1px solid var(--border); }
+.testimonial p { font-size:0.97rem; line-height:1.75; color:rgba(232,240,248,0.8); font-style:italic; margin-bottom:12px; }
+.testimonial-author { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.1em; color:var(--cyan); text-transform:uppercase; }
+
+/* RESEARCH */
+.research-bg { background:var(--deep); border-top:1px solid var(--border); }
+.research-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; margin-top:52px; }
+.research-card { background:var(--panel); padding:34px; transition:background .3s; }
+.research-card:hover { background:rgba(15,30,53,0.9); }
+.research-card-icon { font-size:2rem; margin-bottom:16px; display:block; }
+.research-card h3 { font-size:1.3rem; font-weight:400; margin-bottom:9px; }
+.research-card p { font-size:0.95rem; line-height:1.65; color:var(--muted); }
+
+/* DONATE */
+.donate-section { background:linear-gradient(135deg,rgba(201,168,76,0.07),rgba(0,212,255,0.04)); border-top:1px solid rgba(201,168,76,0.18); }
+.donate-inner { max-width:1200px; margin:0 auto; padding:90px 80px; display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
+.donate-text h2 { color:var(--gold); }
+.donate-text p { font-size:1.08rem; line-height:1.75; color:var(--muted); margin-top:16px; margin-bottom:28px; }
+.donate-address { font-family:'DM Mono',monospace; font-size:0.74rem; line-height:1.9; color:var(--muted); padding:20px; border:1px solid rgba(201,168,76,0.2); background:rgba(201,168,76,0.03); letter-spacing:0.04em; }
+.donate-address strong { color:var(--gold); }
+.impact-box { background:var(--panel); border:1px solid rgba(201,168,76,0.17); padding:40px; text-align:center; }
+.impact-icon { font-size:3.2rem; margin-bottom:16px; }
+.impact-label { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.15em; color:var(--gold); text-transform:uppercase; margin-bottom:11px; }
+.impact-box p { font-size:1.02rem; line-height:1.75; color:var(--muted); font-style:italic; }
+.impact-footer { margin-top:24px; padding-top:24px; border-top:1px solid var(--border); font-family:'DM Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; }
+
+/* CONTACT */
+.contact-section { border-top:1px solid var(--border); }
+.contact-inner { max-width:1200px; margin:0 auto; padding:90px 80px; display:grid; grid-template-columns:1fr 1fr; gap:64px; }
+.contact-detail { margin-bottom:20px; }
+.contact-detail-label { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--cyan); margin-bottom:4px; }
+.contact-detail p { font-size:1rem; color:var(--muted); line-height:1.6; }
+.contact-detail a { color:var(--cyan); text-decoration:none; }
+.contact-form { display:flex; flex-direction:column; gap:11px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+.form-input { background:var(--panel); border:1px solid var(--border); color:var(--white); font-family:'Cormorant Garamond',serif; font-size:1rem; padding:11px 14px; outline:none; transition:border-color .2s; width:100%; }
+.form-input::placeholder { color:var(--muted); font-style:italic; }
+.form-input:focus { border-color:rgba(0,212,255,0.4); }
+textarea.form-input { resize:vertical; min-height:105px; }
+
+/* FOOTER */
+footer { position:relative; z-index:1; border-top:1px solid var(--border); padding:40px 80px; display:flex; justify-content:space-between; align-items:center; background:var(--navy); flex-wrap:wrap; gap:18px; }
+.footer-brand { font-family:'Syne',sans-serif; font-size:0.9rem; font-weight:800; letter-spacing:0.1em; color:var(--white); text-transform:uppercase; }
+.footer-brand span { color:var(--cyan); }
+.footer-copy { font-family:'DM Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.06em; text-align:center; line-height:1.7; }
+.footer-badge { font-family:'DM Mono',monospace; font-size:0.58rem; letter-spacing:0.1em; color:var(--muted); border:1px solid var(--border); padding:5px 12px; text-transform:uppercase; }
+.footer-badge span { color:var(--cyan); }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
+.reveal { opacity:0; transform:translateY(26px); transition:opacity .8s ease, transform .8s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* ══════════════════════════════════════
+   CME PLATFORM
+══════════════════════════════════════ */
+.cme-section { background:var(--deep); border-top:1px solid var(--border); }
+.cme-hero-band {
+  background: linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(201,168,76,0.06) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 80px;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+}
+.cme-hero-band-text { font-family:'DM Mono',monospace; font-size:0.68rem; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; }
+.cme-hero-band-text strong { color:var(--cyan); }
+.cme-credits-badge { display:flex; align-items:center; gap:10px; background:rgba(0,212,255,0.07); border:1px solid rgba(0,212,255,0.2); padding:10px 18px; }
+.cme-credits-badge-num { font-size:2rem; font-weight:300; color:var(--cyan); line-height:1; font-family:'Cormorant Garamond',serif; }
+.cme-credits-badge-label { font-family:'DM Mono',monospace; font-size:0.58rem; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; line-height:1.4; }
+
+.cme-tabs { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:0; }
+.cme-tab { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; padding:14px 28px; background:transparent; border:none; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; transition:all .2s; position:relative; bottom:-1px; }
+.cme-tab.active { color:var(--cyan); border-bottom-color:var(--cyan); }
+.cme-tab:hover { color:var(--white); }
+
+.cme-panel { display:none; }
+.cme-panel.active { display:block; }
+
+/* Course Cards */
+.course-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; margin-top:3px; }
+.course-card { background:var(--panel); overflow:hidden; position:relative; transition:transform .3s; }
+.course-card:hover { transform:translateY(-3px); }
+.course-card-thumb { width:100%; height:160px; object-fit:cover; display:block; filter:brightness(0.7) saturate(0.7); transition:filter .3s; }
+.course-card:hover .course-card-thumb { filter:brightness(0.9) saturate(1); }
+.course-card-body { padding:22px 24px 24px; }
+.course-card-category { font-family:'DM Mono',monospace; font-size:0.58rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--cyan); margin-bottom:8px; }
+.course-card-title { font-size:1.15rem; font-weight:400; margin-bottom:8px; line-height:1.35; }
+.course-card-meta { display:flex; gap:16px; margin-bottom:14px; }
+.course-card-meta span { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.08em; color:var(--muted); text-transform:uppercase; display:flex; align-items:center; gap:5px; }
+.course-card-credits { display:inline-flex; align-items:center; gap:6px; background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.2); color:var(--gold); font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; padding:5px 10px; margin-bottom:14px; }
+.course-card-desc { font-size:0.92rem; line-height:1.6; color:var(--muted); margin-bottom:18px; }
+.course-card-footer { display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--border); }
+.course-card-instructor { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.06em; color:var(--muted); text-transform:uppercase; }
+.course-card-instructor strong { color:var(--white); }
+.btn-enroll { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.08em; text-transform:uppercase; background:var(--cyan); color:var(--navy); padding:8px 16px; border:none; cursor:pointer; font-weight:500; transition:all .2s; }
+.btn-enroll:hover { background:var(--white); }
+.btn-enroll-outline { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.08em; text-transform:uppercase; background:transparent; color:var(--cyan); padding:8px 16px; border:1px solid var(--cyan); cursor:pointer; transition:all .2s; }
+.btn-enroll-outline:hover { background:var(--cyan); color:var(--navy); }
+
+/* Course Modal / Viewer */
+.course-modal-overlay { display:none; position:fixed; inset:0; background:rgba(5,13,26,0.95); z-index:999; overflow-y:auto; backdrop-filter:blur(8px); }
+.course-modal-overlay.open { display:flex; align-items:flex-start; justify-content:center; padding:60px 20px; }
+.course-modal { background:var(--panel); border:1px solid var(--border); max-width:900px; width:100%; position:relative; }
+.course-modal-header { padding:28px 32px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
+.course-modal-close { background:transparent; border:1px solid var(--border); color:var(--muted); font-family:'DM Mono',monospace; font-size:0.65rem; padding:6px 14px; cursor:pointer; text-transform:uppercase; letter-spacing:0.1em; transition:all .2s; flex-shrink:0; }
+.course-modal-close:hover { border-color:var(--cyan); color:var(--cyan); }
+.course-modal-body { padding:32px; }
+.course-module-list { display:flex; flex-direction:column; gap:0; }
+.course-module { border-bottom:1px solid var(--border); }
+.course-module:first-child { border-top:1px solid var(--border); }
+.course-module-header { display:flex; align-items:center; gap:16px; padding:16px 0; cursor:pointer; }
+.course-module-num { font-family:'DM Mono',monospace; font-size:0.6rem; color:var(--cyan); letter-spacing:0.1em; min-width:32px; }
+.course-module-title { flex:1; font-size:1.05rem; }
+.course-module-dur { font-family:'DM Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.08em; }
+.course-module-status { width:20px; height:20px; border:1px solid var(--border); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.55rem; color:var(--cyan); }
+.course-module-status.done { background:var(--cyan); color:var(--navy); border-color:var(--cyan); }
+.course-module-content { display:none; padding:0 0 20px 48px; }
+.course-module-content.open { display:block; }
+.course-module-content p { font-size:0.95rem; line-height:1.7; color:var(--muted); margin-bottom:14px; }
+.quiz-area { background:rgba(0,212,255,0.04); border:1px solid rgba(0,212,255,0.12); padding:20px; margin-top:12px; }
+.quiz-question { font-size:1rem; margin-bottom:14px; }
+.quiz-options { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+.quiz-option { display:flex; align-items:center; gap:10px; padding:10px 14px; border:1px solid var(--border); cursor:pointer; transition:all .2s; font-size:0.9rem; }
+.quiz-option:hover { border-color:var(--cyan); }
+.quiz-option.selected { border-color:var(--cyan); background:rgba(0,212,255,0.07); }
+.quiz-option.correct { border-color:#22c55e; background:rgba(34,197,94,0.08); }
+.quiz-option.wrong { border-color:#ef4444; background:rgba(239,68,68,0.08); }
+.quiz-feedback { font-family:'DM Mono',monospace; font-size:0.68rem; letter-spacing:0.05em; padding:10px 14px; margin-top:8px; }
+.quiz-feedback.correct { background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); color:#22c55e; }
+.quiz-feedback.wrong { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); color:#ef4444; }
+
+/* Certificate */
+.cert-section { margin-top:32px; padding:28px; border:1px solid rgba(201,168,76,0.25); background:rgba(201,168,76,0.04); text-align:center; }
+.cert-icon { font-size:2.5rem; margin-bottom:12px; }
+.cert-title { font-size:1.3rem; margin-bottom:8px; }
+.cert-desc { font-size:0.95rem; color:var(--muted); line-height:1.6; margin-bottom:18px; }
+.progress-bar-wrap { background:rgba(232,240,248,0.08); height:6px; margin:16px 0; }
+.progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--cyan),var(--gold)); transition:width .5s ease; }
+.progress-label { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; display:flex; justify-content:space-between; margin-bottom:6px; }
+
+/* ══════════════════════════════════════
+   FELLOWSHIP APPLICATION PORTAL
+══════════════════════════════════════ */
+.apply-section { border-top:1px solid var(--border); }
+.apply-inner { max-width:1200px; margin:0 auto; padding:90px 80px; }
+.apply-grid { display:grid; grid-template-columns:1fr 1.6fr; gap:64px; margin-top:52px; }
+
+/* Timeline */
+.apply-timeline { display:flex; flex-direction:column; gap:0; }
+.timeline-step { display:flex; gap:20px; padding-bottom:32px; position:relative; }
+.timeline-step:last-child { padding-bottom:0; }
+.timeline-left { display:flex; flex-direction:column; align-items:center; }
+.timeline-dot { width:36px; height:36px; border:2px solid var(--border); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'DM Mono',monospace; font-size:0.68rem; color:var(--muted); flex-shrink:0; transition:all .3s; background:var(--panel); }
+.timeline-dot.active { border-color:var(--cyan); color:var(--cyan); background:rgba(0,212,255,0.08); }
+.timeline-dot.done { border-color:var(--cyan); background:var(--cyan); color:var(--navy); }
+.timeline-line { flex:1; width:1px; background:var(--border); margin:6px 0; }
+.timeline-step:last-child .timeline-line { display:none; }
+.timeline-content { padding-top:6px; }
+.timeline-step-title { font-size:1.1rem; font-weight:400; margin-bottom:4px; }
+.timeline-step-desc { font-size:0.9rem; color:var(--muted); line-height:1.6; }
+.timeline-step-date { font-family:'DM Mono',monospace; font-size:0.6rem; color:var(--gold); letter-spacing:0.1em; text-transform:uppercase; margin-top:6px; }
+
+/* Application Form */
+.apply-form-wrap { background:var(--panel); border:1px solid var(--border); position:relative; overflow:hidden; }
+.apply-form-wrap::before { content:''; position:absolute; top:0; left:0; width:100%; height:3px; background:linear-gradient(90deg,var(--gold),var(--cyan)); }
+.apply-form-header { padding:24px 32px; border-bottom:1px solid var(--border); }
+.apply-form-header h3 { font-size:1.4rem; font-weight:400; margin-bottom:4px; }
+.apply-form-header p { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.08em; color:var(--muted); text-transform:uppercase; }
+
+.apply-steps { display:flex; border-bottom:1px solid var(--border); }
+.apply-step-tab { flex:1; padding:12px; text-align:center; font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); border-bottom:2px solid transparent; position:relative; bottom:-1px; }
+.apply-step-tab.active { color:var(--cyan); border-bottom-color:var(--cyan); }
+.apply-step-tab.done { color:var(--gold); }
+
+.apply-form-body { padding:28px 32px; }
+.apply-form-step { display:none; }
+.apply-form-step.active { display:block; }
+.form-group { margin-bottom:18px; }
+.form-group label { display:block; font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--cyan); margin-bottom:7px; }
+.form-group .form-input { width:100%; }
+.form-group select.form-input { appearance:none; cursor:pointer; }
+.form-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.specialty-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.specialty-opt { display:flex; align-items:center; gap:8px; padding:10px 13px; border:1px solid var(--border); cursor:pointer; font-size:0.88rem; transition:all .2s; }
+.specialty-opt:hover { border-color:var(--cyan); }
+.specialty-opt input { accent-color:var(--cyan); }
+.specialty-opt.checked { border-color:var(--cyan); background:rgba(0,212,255,0.06); }
+
+.file-upload-zone { border:1px dashed rgba(0,212,255,0.3); padding:28px; text-align:center; cursor:pointer; transition:all .2s; background:rgba(0,212,255,0.02); }
+.file-upload-zone:hover { border-color:var(--cyan); background:rgba(0,212,255,0.05); }
+.file-upload-zone p { font-size:0.92rem; color:var(--muted); margin-top:8px; }
+.file-upload-zone .upload-icon { font-size:1.8rem; }
+.file-upload-zone input { display:none; }
+.file-list { margin-top:10px; display:flex; flex-direction:column; gap:6px; }
+.file-item { display:flex; align-items:center; gap:8px; padding:7px 10px; background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.12); font-family:'DM Mono',monospace; font-size:0.62rem; color:var(--muted); letter-spacing:0.05em; }
+.file-item span { color:var(--cyan); }
+
+.apply-form-footer { padding:20px 32px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.step-counter { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; }
+
+/* Success State */
+.apply-success { display:none; text-align:center; padding:48px 32px; }
+.apply-success.show { display:block; }
+.apply-success-icon { font-size:3.5rem; margin-bottom:20px; }
+.apply-success h3 { font-size:1.8rem; font-weight:300; margin-bottom:12px; }
+.apply-success p { font-size:1rem; line-height:1.7; color:var(--muted); max-width:400px; margin:0 auto 24px; }
+.apply-ref { font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.12em; padding:10px 20px; border:1px solid var(--cyan); color:var(--cyan); display:inline-block; }
+
+@media(max-width:900px){
+  nav{padding:13px 18px;} .nav-links{display:none;}
+  .hero{padding:105px 18px 55px;}
+  .stats-band{grid-template-columns:repeat(2,1fr);}
+  .section-inner,.ai-inner,.donate-inner,.contact-inner{padding:56px 18px;}
+  .mission-grid,.fellowship-grid,.ai-inner,.donate-inner,.contact-inner{grid-template-columns:1fr;gap:36px;}
+  .video-grid,.research-grid,.physicians-grid{grid-template-columns:1fr;}
+  .workshop-gallery{grid-template-columns:repeat(4,1fr);}
+  .affiliates-bar{padding:40px 18px;}
+  footer{padding:28px 18px;flex-direction:column;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="neural-canvas"></canvas>
+
+<nav>
+  <a href="#" class="nav-logo">NERA <span>·</span> Windsor</a>
+  <div class="nav-links">
+    <a href="#mission">Mission</a>
+    <a href="#education">Videos</a>
+    <a href="#cme">CME Courses</a>
+    <a href="#physicians">Physicians</a>
+    <a href="#fellowship">Fellowship</a>
+    <a href="#apply">Apply</a>
+    <a href="#research">Research</a>
+    <a href="#ai-assistant">AI</a>
+    <a href="#donate">Donate</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a href="#donate" class="nav-donate">Donate Today</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">Neuroscience Education & Research Academy — Windsor Regional Hospital, Ontario, Canada</p>
+  <h1>Advancing the <em>mind</em><br>that heals the world</h1>
+  <p class="hero-sub">A charitable organization supporting neurosurgery research, clinical fellowship training, surgical education, and patient resources at Windsor Regional Hospital.</p>
+  <div class="hero-ctas">
+    <a href="#education" class="btn-primary">Watch Surgical Videos</a>
+    <a href="#fellowship" class="btn-outline">Fellowship Program</a>
+    <a href="#donate" class="btn-gold">Donate Today</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-band">
+  <div class="stat-item reveal"><div class="stat-num">4</div><div class="stat-label">Surgical Procedure Videos</div></div>
+  <div class="stat-item reveal"><div class="stat-num">5+</div><div class="stat-label">Neurosurgeons & Neurologists</div></div>
+  <div class="stat-item reveal"><div class="stat-num">3</div><div class="stat-label">Academic Affiliates</div></div>
+  <div class="stat-item reveal"><div class="stat-num">∞</div><div class="stat-label">Lives Impacted</div></div>
+</div>
+
+<!-- MISSION -->
+<section id="mission">
+  <div class="section-inner">
+    <div class="section-label">Our Mission</div>
+    <h2>Where science meets <em>service</em></h2>
+    <div class="mission-grid">
+      <div class="mission-text reveal">
+        <p>The Neuroscience Education and Research Academy (NERA) is a charitable organization created to address the needs of our community. Our aim is to support neurosurgery and neurology research projects and the neurosurgery fellowship training program.</p>
+        <p>Our research collaboration initiative provides opportunities for students from high school to undergraduate and graduate levels. This platform also allows our community to be involved in research trials. Our community can support our effort through financial donations.</p>
+        <p>We also provide educational resources — including original surgical procedure videos — produced locally for pure educational purposes, benefiting nursing teams, medical professionals, patients, and the public.</p>
+      </div>
+      <div class="reveal">
+        <div class="pillar"><div class="pillar-num">01</div><div class="pillar-title">Research</div><div class="pillar-desc">High-impact clinical neuroscience research driving Windsor's academic health sciences future.</div></div>
+        <div class="pillar"><div class="pillar-num">02</div><div class="pillar-title">Education</div><div class="pillar-desc">Original surgical videos and annual workshops for staff, patients, and the public.</div></div>
+        <div class="pillar"><div class="pillar-num">03</div><div class="pillar-title">Fellowship</div><div class="pillar-desc">Elite training in general neurosurgery and complex spinal surgery.</div></div>
+        <div class="pillar"><div class="pillar-num">04</div><div class="pillar-title">Community</div><div class="pillar-desc">Engaging Windsor through research participation, education, and charitable giving.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AFFILIATES -->
+<div class="affiliates-bar reveal">
+  <div class="affiliates-label">Academic Affiliates</div>
+  <div class="affiliates-list">
+    <div class="affiliate-name">Schulich School of Medicine</div>
+    <div class="aff-div"></div>
+    <div class="affiliate-name">Western University</div>
+    <div class="aff-div"></div>
+    <div class="affiliate-name">University of Windsor</div>
+  </div>
+</div>
+
+<!-- EDUCATION VIDEOS -->
+<section class="edu-section" id="education">
+  <div class="section-inner">
+    <div class="section-label">Educational Videos</div>
+    <h2>Real procedures. <em>Real learning.</em></h2>
+    <p style="max-width:640px;font-size:1.08rem;color:var(--muted);line-height:1.75;">We provide teaching materials for our Nursing and Medical teams — and for patient and public education. Each video explains procedures with photo, graph, and video footage. All original material is locally produced for pure educational purposes.</p>
+
+    <div class="video-grid">
+      <a href="https://www.nerawindsor.ca/education/brain-tumour-gbm-resection-using-microscope-navigation-and-florentine-video/" target="_blank" class="video-card">
+        <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/07/NERA-BrainTumourGBMresection-WindsorRegionalHospital-1.jpg" alt="Brain Tumour GBM Resection" loading="lazy">
+        <div class="video-card-play">▶</div>
+        <div class="video-card-overlay">
+          <div class="video-card-title">Brain Tumour (GBM) Resection Using Microscope, Navigation & Florentine Video</div>
+          <span class="video-card-cta">View Procedure</span>
+        </div>
+      </a>
+      <a href="https://www.nerawindsor.ca/education/endoscopic-third-ventriculostomy-for-hydrocephalous/" target="_blank" class="video-card">
+        <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/07/NERA-EndoscopicThirdVentriculostomy-WindsorRegionalHospital.jpg" alt="Endoscopic Third Ventriculostomy" loading="lazy">
+        <div class="video-card-play">▶</div>
+        <div class="video-card-overlay">
+          <div class="video-card-title">Dr. Elashaal — Endoscopic Third Ventriculostomy for Hydrocephalus</div>
+          <span class="video-card-cta">View Procedure</span>
+        </div>
+      </a>
+      <a href="https://www.nerawindsor.ca/education/trigeminal-neuralgia-balloon-injection-1/" target="_blank" class="video-card">
+        <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/07/NERA-Trigeminal-Neuralgia-Balloon-Injection-1.jpg" alt="Trigeminal Neuralgia Balloon Injection 1" loading="lazy">
+        <div class="video-card-play">▶</div>
+        <div class="video-card-overlay">
+          <div class="video-card-title">Dr. Elashaal — Trigeminal Neuralgia Balloon Injection (Part 1)</div>
+          <span class="video-card-cta">View Procedure</span>
+        </div>
+      </a>
+      <a href="https://www.nerawindsor.ca/education/trigeminal-neuralgia-2/" target="_blank" class="video-card">
+        <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/07/NERA-Trigeminal-Neuralgia-2.jpg" alt="Trigeminal Neuralgia 2" loading="lazy">
+        <div class="video-card-play">▶</div>
+        <div class="video-card-overlay">
+          <div class="video-card-title">Dr. Elashaal — Trigeminal Neuralgia (Part 2)</div>
+          <span class="video-card-cta">View Procedure</span>
+        </div>
+      </a>
+    </div>
+
+    <div style="margin-top:36px;padding:26px 30px;border:1px solid rgba(0,212,255,0.1);background:rgba(0,212,255,0.03);">
+      <p style="font-size:0.98rem;line-height:1.7;color:var(--muted);">As a Department of Neurosciences, we thank our supporting Nursing teams at Windsor Regional Hospital for their help and outstanding commitment — with a special thanks to our <strong style="color:var(--white)">Nurse Practitioner and Nursing Team in Neurosurgery 8 East, Windsor Regional Hospital.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- WORKSHOP VIDEO -->
+<section class="workshop-section" id="workshop">
+  <div class="section-inner" style="padding-top:0;">
+    <br><br>
+    <div class="section-label">Annual Workshop</div>
+    <h2>Hands-on training, <em>every year</em></h2>
+    <p style="max-width:620px;font-size:1.08rem;color:var(--muted);line-height:1.75;">Every year the Neurosurgery Division organizes one to two advanced hands-on workshops for Residents, Fellows, and Nurse Practitioners — running continuously since 2020.</p>
+
+    <div class="workshop-video-wrap reveal">
+      <video controls poster="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital6.jpg">
+        <source src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshops-WindsorRegionalHospital.mp4" type="video/mp4">
+        Your browser does not support video playback.
+      </video>
+    </div>
+
+    <div class="workshop-gallery reveal" style="margin-top:3px;">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital.jpg" alt="Workshop" loading="lazy">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital2.jpg" alt="Workshop 2" loading="lazy">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital3.jpg" alt="Workshop 3" loading="lazy">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital4.jpg" alt="Workshop 4" loading="lazy">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital5.jpg" alt="Workshop 5" loading="lazy">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital7.jpg" alt="Workshop 7" loading="lazy">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital8.jpg" alt="Workshop 8" loading="lazy">
+    </div>
+    <div class="workshop-gallery reveal" style="margin-top:3px;">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital9.jpg" alt="Workshop 9" loading="lazy">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital10.jpg" alt="Workshop 10" loading="lazy">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital11.jpg" alt="Workshop 11" loading="lazy">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital12.jpg" alt="Workshop 12" loading="lazy">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital13.jpg" alt="Workshop 13" loading="lazy">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital14.jpg" alt="Workshop 14" loading="lazy">
+      <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital6.jpg" alt="Workshop 6" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- PHYSICIANS -->
+<section class="physicians-section" id="physicians">
+  <div class="section-inner">
+    <div class="section-label">Our Team</div>
+    <h2>The <em>neurosurgeons</em> of Windsor</h2>
+    <div class="physicians-grid">
+      <div class="physician-card reveal">
+        <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Dr-Abdurrahim-Elashaal-1.jpg" alt="Dr. Abdurrahim Elashaal">
+        <div class="physician-info">
+          <div class="physician-role">Neurosurgeon</div>
+          <div class="physician-name">Dr. Abdurrahim Elashaal</div>
+          <p class="physician-bio">MD, FRCS Ireland, FRCS Canada. Double Fellowship from Toronto in skull base & vascular neurosurgery and complex spinal neurosurgery. Special interest in endoscopic pituitary surgery, trigeminal neuralgia, brain & spinal tumors, vascular lesions, hydrocephalus, and minimally invasive spinal surgery.</p>
+        </div>
+      </div>
+      <div class="physician-card reveal">
+        <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Windsor-NeurosurgeonsDrAbdalla-Shamisa.jpg" alt="Dr. Abdalla Shamisa">
+        <div class="physician-info">
+          <div class="physician-role">Neurosurgeon</div>
+          <div class="physician-name">Dr. Abdalla Shamisa</div>
+          <p class="physician-bio">Neurosurgeon at Windsor Regional Hospital, contributing to NERA's mission of advancing neuroscience research and education in Windsor.</p>
+        </div>
+      </div>
+      <div class="physician-card reveal">
+        <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Windsor-NeurosurgeonDrBJhawar.jpg" alt="Dr. B. Jhawar">
+        <div class="physician-info">
+          <div class="physician-role">Neurosurgeon</div>
+          <div class="physician-name">Dr. B. Jhawar</div>
+          <p class="physician-bio">Neurosurgeon at Windsor Regional Hospital, part of the NERA team committed to excellence in clinical care and surgical education.</p>
+        </div>
+      </div>
+      <div class="physician-card reveal">
+        <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Windsor-Neurosurgeons-Dr-ErinDyer.jpg" alt="Dr. Erin Dyer">
+        <div class="physician-info">
+          <div class="physician-role">Neurosurgeon</div>
+          <div class="physician-name">Dr. Erin Dyer</div>
+          <p class="physician-bio">Neurosurgeon at Windsor Regional Hospital contributing to NERA's clinical and educational programs.</p>
+        </div>
+      </div>
+      <div class="physician-card reveal">
+        <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Dr.-Abdul-Naeem.jpg" alt="Dr. Abdul Naeem">
+        <div class="physician-info">
+          <div class="physician-role">Locum Neurosurgeon</div>
+          <div class="physician-name">Dr. Abdul Naeem</div>
+          <p class="physician-bio">Trained in London, Ontario. Completed his spinal surgery fellowship at Windsor — and went on to describe it as "an absolute pleasure." A living testament to NERA's fellowship excellence.</p>
+        </div>
+      </div>
+      <div class="physician-card reveal">
+        <img src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/NeraWindsor-PhysicianPlaceholder.jpg" alt="Dr. Abdulhakim Mustafa">
+        <div class="physician-info">
+          <div class="physician-role">Neurologist</div>
+          <div class="physician-name">Dr. Abdulhakim Mustafa</div>
+          <p class="physician-bio">Part of Windsor Regional Hospital's neurology team, which includes 5 Neurologists and 2 Stroke Neurologists delivering specialized neurological care.</p>
+        </div>
+      </div>
+    </div>
+    <div class="neuro-note reveal">
+      Windsor Regional Hospital is home to <strong>5 Neurologists</strong> and <strong>2 Stroke Neurologists</strong> — delivering full-spectrum neurological and cerebrovascular care to Windsor and the surrounding region.
+    </div>
+  </div>
+</section>
+
+<!-- AI ASSISTANT -->
+<section class="ai-section" id="ai-assistant">
+  <div class="ai-inner">
+    <div class="ai-intro">
+      <div class="section-label">Powered by Claude AI</div>
+      <h2>Ask our <em>Neuro</em> AI</h2>
+      <p>Get instant answers about our surgical procedures, fellowship program, physicians, research, and how to support NERA. Trained on neuroscience knowledge and all of NERA's programs.</p>
+      <div class="ai-badge">AI Online — Ready to Help</div>
+      <br><br>
+      <p style="font-size:0.85rem;color:var(--muted);font-style:italic;">General educational information only. Not a substitute for medical advice. Always consult a qualified physician.</p>
+    </div>
+    <div>
+      <div class="quick-questions">
+        <button class="quick-q" onclick="askQuick(this)">What is GBM?</button>
+        <button class="quick-q" onclick="askQuick(this)">What is trigeminal neuralgia?</button>
+        <button class="quick-q" onclick="askQuick(this)">Fellowship details?</button>
+        <button class="quick-q" onclick="askQuick(this)">How to donate?</button>
+        <button class="quick-q" onclick="askQuick(this)">Research opportunities?</button>
+        <button class="quick-q" onclick="askQuick(this)">About Dr. Elashaal?</button>
+      </div>
+      <div class="chat-widget" style="margin-top:9px;">
+        <div class="chat-header">
+          <div class="chat-header-icon">🧠</div>
+          <div class="chat-header-text">NERA Neuro AI<small>Neuroscience Knowledge Assistant</small></div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="msg msg-ai">
+            <div class="msg-ai-label">NERA AI</div>
+            Welcome to NERA Windsor. Ask me about our surgical procedures, fellowship program, physicians, research opportunities, or how to support us. How can I help?
+          </div>
+        </div>
+        <div class="typing-indicator" id="typing"><span></span><span></span><span></span></div>
+        <div class="chat-input-area">
+          <input class="chat-input" id="chat-input" type="text" placeholder="Ask about procedures, fellowship, research…" onkeydown="if(event.key==='Enter') sendChat()">
+          <button class="chat-send" id="chat-send" onclick="sendChat()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FELLOWSHIP -->
+<section class="fellowship-section" id="fellowship">
+  <div class="section-inner">
+    <div class="section-label">Fellowship Program</div>
+    <h2>Train at the <em>frontier</em> of neurosurgery</h2>
+    <div class="fellowship-grid">
+      <div>
+        <div class="fellowship-card reveal">
+          <h3>General Neurosurgery & Spinal Surgery</h3>
+          <p>We offer fellowship training in general neurosurgery and spinal surgery in Windsor, Ontario. This fellowship provides an excellent opportunity to enhance clinical experience across all aspects of neurosurgery — including complex spine surgery, minimally invasive techniques, neuro-trauma, neuro-oncology, and peripheral nervous system pathologies. Affiliated with Schulich School of Medicine at Western University.</p>
+          <a href="mailto:Windsor.spinal.fellowship@gmail.com" class="btn-outline" style="font-size:0.68rem;padding:10px 20px;">Apply for Fellowship →</a>
+        </div>
+        <br>
+        <div class="fellowship-card reveal" style="background:rgba(0,212,255,0.03);">
+          <h3>What Fellows Experience</h3>
+          <p>Complex spine surgery · Minimally invasive techniques · Neuro-trauma management · Neuro-oncology · Peripheral nervous system pathologies · Surgical education from pre-med through residency</p>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="section-label" style="margin-bottom:24px;">What Our Fellows Say</div>
+        <div class="testimonial">
+          <p>"It has been an absolute pleasure being a fellow at Windsor Neurosurgery. I am thankful for the vast learning opportunities and mentorship in providing exceptional sub-specialty care in minimally invasive spine surgery, neuro-trauma, neuro-oncology, and pathologies of the peripheral nervous system. I am also grateful for the opportunity to play a significant role in surgical education at all levels from pre-medical students to residents."</p>
+          <div class="testimonial-author">— Dr. Abdul Naeem, Fellow</div>
+        </div>
+        <div class="testimonial">
+          <p>"I am in love with Neurosurgery. I am fortunate to have been surrounded by wonderful and positive mentors and colleagues. I will continue my career with all my heart, and try to give everything I can for those in need. Neurosurgery has become a part of me and I desire to make a difference."</p>
+          <div class="testimonial-author">— Dr. Abdallah Alkhamees, Fellow</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESEARCH -->
+<section class="research-bg" id="research">
+  <div class="section-inner">
+    <div class="section-label">Research</div>
+    <h2>Purposeful science for <em>real impact</em></h2>
+    <p style="max-width:600px;font-size:1.08rem;color:var(--muted);line-height:1.75;">Windsor is transitioning from a regional centre of excellence to an established health sciences academic centre. NERA's research unit is dedicated to conducting purposeful clinical research at the heart of that transformation.</p>
+    <div class="research-grid">
+      <div class="research-card reveal"><span class="research-card-icon">🔬</span><h3>Clinical Research</h3><p>High-impact neuroscience research with real-world outcomes for patients in Windsor and beyond.</p></div>
+      <div class="research-card reveal"><span class="research-card-icon">🎓</span><h3>Student Collaboration</h3><p>Opportunities from high school through graduate study — building the next generation of neuroscientists in Windsor.</p></div>
+      <div class="research-card reveal"><span class="research-card-icon">🌍</span><h3>Community Trials</h3><p>Windsor residents can participate directly in research trials and help shape the future of neurological care.</p></div>
+    </div>
+    <div style="margin-top:40px;display:flex;gap:14px;flex-wrap:wrap;">
+      <a href="mailto:nera.windsor@gmail.com" class="btn-outline">Submit a Research Inquiry</a>
+      <a href="mailto:nera.windsor@gmail.com" class="btn-outline">Join a Research Trial</a>
+    </div>
+  </div>
+</section>
+
+<!-- DONATE -->
+<section class="donate-section" id="donate">
+  <div class="donate-inner">
+    <div class="donate-text reveal">
+      <div class="section-label">Donations</div>
+      <h2>Train surgeons. <em>Change lives.</em></h2>
+      <p>By supporting NERA, you are enabling an opportunity to help train surgeons from under-resourced and under-served countries. The clinical fellowship is dedicated to excellent patient care, research, and education — and with your gift, surgeons become future regional leaders in their home countries.</p>
+      <a href="#contact" class="btn-gold" style="display:inline-block;margin-bottom:26px;">Make a Donation</a>
+      <div class="donate-address">
+        <strong>Cheques payable to:</strong><br>
+        NERA – Neurosciences Education Research Academy<br><br>
+        1106 Ouellette Ave., Suite 103<br>
+        Windsor, ON &nbsp;N9A 1C9 &nbsp;Canada
+      </div>
+    </div>
+    <div class="impact-box reveal">
+      <div class="impact-icon">🧠</div>
+      <div class="impact-label">Why Give to NERA?</div>
+      <p>"Your support enables surgeons from under-resourced countries to train, improve healthcare, and become future regional leaders in neurosurgery."</p>
+      <div class="impact-footer">NERA is a registered charitable organization</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="contact-inner">
+    <div class="reveal">
+      <div class="section-label">Contact Us</div>
+      <h2>Let's <em>connect</em></h2>
+      <div class="contact-detail">
+        <div class="contact-detail-label">Head Office</div>
+        <p>1100 Ouellette Ave., Unit 300<br>Windsor, ON &nbsp;N9A 1C9</p>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-detail-label">Phone / Fax</div>
+        <p>1-519-973-8771 ext. 225<br>Fax: 1-519-9734-690</p>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-detail-label">Research Applications</div>
+        <p><a href="mailto:nera.windsor@gmail.com">nera.windsor@gmail.com</a></p>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-detail-label">Fellowship Applications</div>
+        <p><a href="mailto:Windsor.spinal.fellowship@gmail.com">Windsor.spinal.fellowship@gmail.com</a></p>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="section-label">Send a Message</div>
+      <div class="contact-form">
+        <div class="form-row">
+          <input class="form-input" type="text" placeholder="Your Name">
+          <input class="form-input" type="tel" placeholder="Phone Number">
+        </div>
+        <input class="form-input" type="email" placeholder="Email Address">
+        <input class="form-input" type="text" placeholder="Subject">
+        <textarea class="form-input" placeholder="Your message…"></textarea>
+        <button class="btn-primary" style="align-self:flex-start;">Send Message</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     CME PLATFORM
+══════════════════════════════════════ -->
+<section class="cme-section" id="cme">
+  <div class="section-inner">
+    <div class="section-label">CME Learning Platform</div>
+    <h2>Earn credits. <em>Advance your practice.</em></h2>
+    <p style="max-width:640px;font-size:1.08rem;color:var(--muted);line-height:1.75;">Continuing Medical Education is a requirement for every practicing physician. NERA delivers accredited CME courses built from real Windsor neurosurgery cases — available on demand, 24/7.</p>
+  </div>
+
+  <div class="cme-hero-band">
+    <div class="cme-hero-band-text">NERA CME Portal — <strong>Accredited neuroscience education</strong> for physicians, residents, and nurse practitioners</div>
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+      <div class="cme-credits-badge">
+        <div class="cme-credits-badge-num">12</div>
+        <div class="cme-credits-badge-label">CME Credits<br>Available</div>
+      </div>
+      <div class="cme-credits-badge">
+        <div class="cme-credits-badge-num">4</div>
+        <div class="cme-credits-badge-label">Courses<br>Live Now</div>
+      </div>
+      <div class="cme-credits-badge">
+        <div class="cme-credits-badge-num">∞</div>
+        <div class="cme-credits-badge-label">Access<br>On Demand</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1200px;margin:0 auto;padding:0 80px 90px;">
+    <div class="cme-tabs" style="margin-top:40px;">
+      <button class="cme-tab active" onclick="showCMETab('all',this)">All Courses</button>
+      <button class="cme-tab" onclick="showCMETab('neuro',this)">Neurosurgery</button>
+      <button class="cme-tab" onclick="showCMETab('spine',this)">Spine</button>
+      <button class="cme-tab" onclick="showCMETab('oncology',this)">Neuro-Oncology</button>
+    </div>
+
+    <div id="cme-tab-all" class="cme-panel active">
+      <div class="course-grid">
+
+        <!-- Course 1 -->
+        <div class="course-card reveal">
+          <img class="course-card-thumb" src="https://www.nerawindsor.ca/wp-content/uploads/2021/07/NERA-BrainTumourGBMresection-WindsorRegionalHospital-1.jpg" alt="GBM">
+          <div class="course-card-body">
+            <div class="course-card-category">Neuro-Oncology</div>
+            <div class="course-card-title">GBM Resection: Microscope, Navigation & Fluorescence</div>
+            <div class="course-card-meta">
+              <span>⏱ 3.5 hrs</span>
+              <span>📋 4 modules</span>
+              <span>🎯 Intermediate</span>
+            </div>
+            <div class="course-card-credits">🏅 3.5 CME Credits</div>
+            <div class="course-card-desc">Master the complete surgical workflow for GBM resection using intraoperative navigation, microscopy, and 5-ALA fluorescence-guided surgery. Real cases from Windsor Regional Hospital.</div>
+            <div class="course-card-footer">
+              <div class="course-card-instructor">Instructor: <strong>Dr. Elashaal</strong></div>
+              <button class="btn-enroll" onclick="openCourse(0)">Start Course</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course 2 -->
+        <div class="course-card reveal">
+          <img class="course-card-thumb" src="https://www.nerawindsor.ca/wp-content/uploads/2021/07/NERA-EndoscopicThirdVentriculostomy-WindsorRegionalHospital.jpg" alt="ETV">
+          <div class="course-card-body">
+            <div class="course-card-category">Endoscopic Neurosurgery</div>
+            <div class="course-card-title">Endoscopic Third Ventriculostomy for Hydrocephalus</div>
+            <div class="course-card-meta">
+              <span>⏱ 2.5 hrs</span>
+              <span>📋 3 modules</span>
+              <span>🎯 Advanced</span>
+            </div>
+            <div class="course-card-credits">🏅 2.5 CME Credits</div>
+            <div class="course-card-desc">A comprehensive walkthrough of ETV technique, patient selection criteria, endoscope navigation, and management of intraoperative complications.</div>
+            <div class="course-card-footer">
+              <div class="course-card-instructor">Instructor: <strong>Dr. Elashaal</strong></div>
+              <button class="btn-enroll" onclick="openCourse(1)">Start Course</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course 3 -->
+        <div class="course-card reveal">
+          <img class="course-card-thumb" src="https://www.nerawindsor.ca/wp-content/uploads/2021/07/NERA-Trigeminal-Neuralgia-Balloon-Injection-1.jpg" alt="TN">
+          <div class="course-card-body">
+            <div class="course-card-category">Pain Neurosurgery</div>
+            <div class="course-card-title">Trigeminal Neuralgia: Percutaneous Balloon Microcompression</div>
+            <div class="course-card-meta">
+              <span>⏱ 3 hrs</span>
+              <span>📋 4 modules</span>
+              <span>🎯 Intermediate</span>
+            </div>
+            <div class="course-card-credits">🏅 3 CME Credits</div>
+            <div class="course-card-desc">Diagnosis, surgical technique, and patient outcomes for percutaneous balloon microcompression. Includes fluoroscopic guidance, Meckel's cave anatomy, and complication avoidance.</div>
+            <div class="course-card-footer">
+              <div class="course-card-instructor">Instructor: <strong>Dr. Elashaal</strong></div>
+              <button class="btn-enroll" onclick="openCourse(2)">Start Course</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course 4 -->
+        <div class="course-card reveal">
+          <img class="course-card-thumb" src="https://www.nerawindsor.ca/wp-content/uploads/2021/06/Neurosurgery-Workshop-WindsorRegionalHospital6.jpg" alt="Spine">
+          <div class="course-card-body">
+            <div class="course-card-category">Spine Surgery</div>
+            <div class="course-card-title">Minimally Invasive Spine Surgery: Core Principles</div>
+            <div class="course-card-meta">
+              <span>⏱ 4 hrs</span>
+              <span>📋 5 modules</span>
+              <span>🎯 All Levels</span>
+            </div>
+            <div class="course-card-credits">🏅 4 CME Credits</div>
+            <div class="course-card-desc">From lumbar microdiscectomy to complex spinal reconstruction — this course covers the full MISS spectrum with live case videos from Windsor Regional Hospital's annual workshop.</div>
+            <div class="course-card-footer">
+              <div class="course-card-instructor">Instructor: <strong>NERA Faculty</strong></div>
+              <button class="btn-enroll" onclick="openCourse(3)">Start Course</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Teaser Card -->
+        <div class="course-card reveal" style="grid-column:span 2;background:rgba(0,212,255,0.03);border:1px dashed rgba(0,212,255,0.2);display:flex;align-items:center;justify-content:space-between;padding:32px 36px;gap:24px;">
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;">Coming Soon</div>
+            <div style="font-size:1.4rem;font-weight:400;margin-bottom:8px;">Neuro-Oncology · Stroke Neurology · Pituitary Surgery + More</div>
+            <div style="font-size:0.95rem;color:var(--muted);">New courses added quarterly by NERA's physician faculty. Register to be notified.</div>
+          </div>
+          <button class="btn-outline" style="white-space:nowrap;font-size:0.68rem;">Get Notified</button>
+        </div>
+
+      </div>
+    </div><!-- end cme-tab-all -->
+  </div>
+</section>
+
+<!-- COURSE MODAL -->
+<div class="course-modal-overlay" id="course-modal">
+  <div class="course-modal">
+    <div class="course-modal-header">
+      <div>
+        <div id="modal-category" style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;color:var(--cyan);text-transform:uppercase;margin-bottom:6px;"></div>
+        <div id="modal-title" style="font-size:1.6rem;font-weight:300;"></div>
+        <div id="modal-instructor" style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;color:var(--muted);margin-top:4px;text-transform:uppercase;"></div>
+      </div>
+      <button class="course-modal-close" onclick="closeCourse()">✕ Close</button>
+    </div>
+    <div class="course-modal-body">
+      <div style="display:flex;gap:16px;margin-bottom:28px;flex-wrap:wrap;">
+        <div class="progress-label" style="justify-content:flex-start;gap:8px;">
+          <span id="modal-progress-text">0% Complete</span>
+        </div>
+        <div id="modal-credits" class="course-card-credits"></div>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="modal-progress-bar" style="width:0%"></div></div>
+
+      <div class="course-module-list" id="modal-modules"></div>
+
+      <div class="cert-section" id="cert-section" style="display:none;">
+        <div class="cert-icon">🎓</div>
+        <div class="cert-title">Course Complete</div>
+        <div class="cert-desc">You have successfully completed this CME course. Your certificate of completion is ready for download and has been logged to your CME record.</div>
+        <button class="btn-primary" onclick="downloadCert()">Download Certificate (PDF)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     FELLOWSHIP APPLICATION PORTAL
+══════════════════════════════════════ -->
+<section class="apply-section" id="apply">
+  <div class="apply-inner">
+    <div class="section-label">Fellowship Application Portal</div>
+    <h2>Apply to train with <em>Windsor's best</em></h2>
+    <p style="max-width:620px;font-size:1.08rem;color:var(--muted);line-height:1.75;">Our fellowship program trains neurosurgeons from around the world. Submit your application directly here — no emails, no PDFs sent into the void. Track your status in real time.</p>
+
+    <div class="apply-grid">
+
+      <!-- Timeline -->
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:28px;">Application Timeline</div>
+        <div class="apply-timeline">
+          <div class="timeline-step">
+            <div class="timeline-left"><div class="timeline-dot active">1</div><div class="timeline-line"></div></div>
+            <div class="timeline-content">
+              <div class="timeline-step-title">Online Application</div>
+              <div class="timeline-step-desc">Submit your personal info, specialty interest, and supporting documents through this portal.</div>
+              <div class="timeline-step-date">Rolling — Apply Anytime</div>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="timeline-left"><div class="timeline-dot">2</div><div class="timeline-line"></div></div>
+            <div class="timeline-content">
+              <div class="timeline-step-title">Document Review</div>
+              <div class="timeline-step-desc">NERA's fellowship committee reviews your CV, letters of reference, and academic credentials.</div>
+              <div class="timeline-step-date">2–4 weeks after submission</div>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="timeline-left"><div class="timeline-dot">3</div><div class="timeline-line"></div></div>
+            <div class="timeline-content">
+              <div class="timeline-step-title">Interview</div>
+              <div class="timeline-step-desc">Shortlisted candidates are invited for a virtual or in-person interview with senior faculty.</div>
+              <div class="timeline-step-date">By appointment</div>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="timeline-left"><div class="timeline-dot">4</div><div class="timeline-line"></div></div>
+            <div class="timeline-content">
+              <div class="timeline-step-title">Offer & Onboarding</div>
+              <div class="timeline-step-desc">Successful applicants receive a formal offer and NERA's onboarding package for Windsor.</div>
+              <div class="timeline-step-date">Fellowship starts by arrangement</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:40px;padding:24px;border:1px solid var(--border);background:var(--panel);">
+          <div style="font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;color:var(--cyan);text-transform:uppercase;margin-bottom:10px;">Questions?</div>
+          <p style="font-size:0.95rem;color:var(--muted);line-height:1.65;margin-bottom:14px;">Contact the fellowship coordinator directly for program-specific questions.</p>
+          <a href="mailto:Windsor.spinal.fellowship@gmail.com" class="btn-outline" style="font-size:0.65rem;padding:9px 18px;">Windsor.spinal.fellowship@gmail.com</a>
+        </div>
+      </div>
+
+      <!-- Application Form -->
+      <div>
+        <div class="apply-form-wrap">
+          <div class="apply-form-header">
+            <h3>Fellowship Application</h3>
+            <p>NERA Windsor · Neurosurgery & Spinal Surgery</p>
+          </div>
+
+          <div class="apply-steps" id="apply-steps">
+            <div class="apply-step-tab active" id="step-tab-1">Personal Info</div>
+            <div class="apply-step-tab" id="step-tab-2">Training Background</div>
+            <div class="apply-step-tab" id="step-tab-3">Documents</div>
+            <div class="apply-step-tab" id="step-tab-4">Submit</div>
+          </div>
+
+          <div class="apply-form-body">
+
+            <!-- Step 1: Personal -->
+            <div class="apply-form-step active" id="apply-step-1">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label>First Name *</label>
+                  <input class="form-input" type="text" placeholder="First name" id="f-first">
+                </div>
+                <div class="form-group">
+                  <label>Last Name *</label>
+                  <input class="form-input" type="text" placeholder="Last name" id="f-last">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Email Address *</label>
+                <input class="form-input" type="email" placeholder="your@email.com" id="f-email">
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label>Phone</label>
+                  <input class="form-input" type="tel" placeholder="+1 (___) ___-____" id="f-phone">
+                </div>
+                <div class="form-group">
+                  <label>Country of Origin</label>
+                  <input class="form-input" type="text" placeholder="Country" id="f-country">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Current Institution</label>
+                <input class="form-input" type="text" placeholder="Hospital or university" id="f-institution">
+              </div>
+              <div class="form-group">
+                <label>Desired Start Date</label>
+                <input class="form-input" type="month" id="f-start">
+              </div>
+            </div>
+
+            <!-- Step 2: Training -->
+            <div class="apply-form-step" id="apply-step-2">
+              <div class="form-group">
+                <label>Medical Degree *</label>
+                <select class="form-input" id="f-degree">
+                  <option value="">Select degree</option>
+                  <option>MD</option>
+                  <option>MBBS</option>
+                  <option>DO</option>
+                  <option>MBChB</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Years of Neurosurgery Experience *</label>
+                <select class="form-input" id="f-exp">
+                  <option value="">Select</option>
+                  <option>Resident (1–3 years)</option>
+                  <option>Senior Resident (4–6 years)</option>
+                  <option>Completed Residency</option>
+                  <option>Practicing Neurosurgeon</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Specialty Interest *</label>
+                <div class="specialty-grid">
+                  <label class="specialty-opt"><input type="checkbox" onchange="toggleSpecialty(this)"> Complex Spine Surgery</label>
+                  <label class="specialty-opt"><input type="checkbox" onchange="toggleSpecialty(this)"> Minimally Invasive Spine</label>
+                  <label class="specialty-opt"><input type="checkbox" onchange="toggleSpecialty(this)"> Neuro-Oncology</label>
+                  <label class="specialty-opt"><input type="checkbox" onchange="toggleSpecialty(this)"> Neuro-Trauma</label>
+                  <label class="specialty-opt"><input type="checkbox" onchange="toggleSpecialty(this)"> Endoscopic Neurosurgery</label>
+                  <label class="specialty-opt"><input type="checkbox" onchange="toggleSpecialty(this)"> Peripheral Nervous System</label>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Statement of Purpose *</label>
+                <textarea class="form-input" rows="4" placeholder="Why do you want to train at NERA Windsor? What are your career goals?" id="f-statement"></textarea>
+              </div>
+            </div>
+
+            <!-- Step 3: Documents -->
+            <div class="apply-form-step" id="apply-step-3">
+              <div class="form-group">
+                <label>Curriculum Vitae (CV) *</label>
+                <div class="file-upload-zone" onclick="document.getElementById('upload-cv').click()">
+                  <div class="upload-icon">📄</div>
+                  <p>Click to upload your CV (PDF, DOC, max 5MB)</p>
+                  <input type="file" id="upload-cv" accept=".pdf,.doc,.docx" onchange="handleFile(this,'cv-list')">
+                </div>
+                <div class="file-list" id="cv-list"></div>
+              </div>
+              <div class="form-group">
+                <label>Letters of Reference (up to 3)</label>
+                <div class="file-upload-zone" onclick="document.getElementById('upload-ref').click()">
+                  <div class="upload-icon">📨</div>
+                  <p>Upload reference letters (PDF, max 5MB each)</p>
+                  <input type="file" id="upload-ref" accept=".pdf" multiple onchange="handleFile(this,'ref-list')">
+                </div>
+                <div class="file-list" id="ref-list"></div>
+              </div>
+              <div class="form-group">
+                <label>Medical Licence / Registration Certificate</label>
+                <div class="file-upload-zone" onclick="document.getElementById('upload-lic').click()">
+                  <div class="upload-icon">🏥</div>
+                  <p>Upload licence document (PDF, max 5MB)</p>
+                  <input type="file" id="upload-lic" accept=".pdf" onchange="handleFile(this,'lic-list')">
+                </div>
+                <div class="file-list" id="lic-list"></div>
+              </div>
+            </div>
+
+            <!-- Step 4: Review & Submit -->
+            <div class="apply-form-step" id="apply-step-4">
+              <div id="review-summary" style="background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.12);padding:20px;margin-bottom:20px;font-size:0.92rem;line-height:1.8;color:var(--muted);"></div>
+              <div class="form-group">
+                <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:0.9rem;color:var(--muted);">
+                  <input type="checkbox" id="f-agree" style="accent-color:var(--cyan);margin-top:3px;flex-shrink:0;">
+                  I confirm that all information provided is accurate and complete. I understand that NERA Windsor will contact me at the email address provided regarding my application status.
+                </label>
+              </div>
+              <div style="padding:16px;border:1px solid rgba(201,168,76,0.2);background:rgba(201,168,76,0.04);font-family:'DM Mono',monospace;font-size:0.65rem;line-height:1.7;color:var(--muted);letter-spacing:0.05em;">
+                📬 Applications are reviewed on a rolling basis.<br>
+                📞 Questions: 1-519-973-8771 ext. 225<br>
+                ✉️ Windsor.spinal.fellowship@gmail.com
+              </div>
+            </div>
+
+          </div><!-- apply-form-body -->
+
+          <!-- Success -->
+          <div class="apply-success" id="apply-success">
+            <div class="apply-success-icon">✅</div>
+            <h3>Application Submitted</h3>
+            <p>Thank you for applying to the NERA Windsor Fellowship Program. Our team will review your application and contact you within 2–4 weeks.</p>
+            <div class="apply-ref" id="apply-ref-num"></div>
+          </div>
+
+          <div class="apply-form-footer" id="apply-form-footer">
+            <div class="step-counter" id="step-counter">Step 1 of 4</div>
+            <div style="display:flex;gap:10px;">
+              <button class="btn-outline" id="btn-prev" onclick="applyPrev()" style="display:none;font-size:0.68rem;padding:10px 20px;">← Back</button>
+              <button class="btn-primary" id="btn-next" onclick="applyNext()" style="font-size:0.68rem;padding:10px 20px;">Next →</button>
+              <button class="btn-gold" id="btn-submit" onclick="submitApplication()" style="display:none;font-size:0.68rem;padding:10px 20px;">Submit Application</button>
+            </div>
+          </div>
+        </div><!-- apply-form-wrap -->
+      </div>
+
+    </div><!-- apply-grid -->
+  </div>
+</section>
+
+<footer>
+  <div class="footer-brand">NERA <span>·</span> Windsor</div>
+  <div class="footer-copy">© 2024 Neurosciences Education and Research Academy<br>1100 Ouellette Ave., Unit 300, Windsor, ON N9A 1C9</div>
+  <div class="footer-badge">Claudized™ by <span>#ClaudizeIt</span></div>
+</footer>
+
+<script>
+// NEURAL CANVAS
+const canvas=document.getElementById('neural-canvas'),ctx=canvas.getContext('2d');
+let nodes=[],W,H;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',()=>{resize();initNodes();});
+function initNodes(){nodes=[];const c=Math.floor((W*H)/15000);for(let i=0;i<c;i++)nodes.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.6+0.7});}
+initNodes();
+function drawNeural(){
+  ctx.clearRect(0,0,W,H);
+  nodes.forEach(n=>{n.x+=n.vx;n.y+=n.vy;if(n.x<0||n.x>W)n.vx*=-1;if(n.y<0||n.y>H)n.vy*=-1;ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);ctx.fillStyle='rgba(0,212,255,0.5)';ctx.fill();});
+  for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){const dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<125){ctx.beginPath();ctx.moveTo(nodes[i].x,nodes[i].y);ctx.lineTo(nodes[j].x,nodes[j].y);ctx.strokeStyle=`rgba(0,212,255,${.12*(1-d/125)})`;ctx.lineWidth=.5;ctx.stroke();}}
+  requestAnimationFrame(drawNeural);
+}
+drawNeural();
+
+// REVEAL
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible');}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(r=>obs.observe(r));
+
+// AI CHAT
+const SYS=`You are the NERA Windsor AI Assistant — a knowledgeable, warm, professional neuroscience guide for the Neuroscience Education and Research Academy (NERA) in Windsor, Ontario, Canada.
+
+NERA is a charitable organization that:
+- Supports neurosurgery and neurology research at Windsor Regional Hospital
+- Runs a neurosurgery fellowship (complex spine, minimally invasive spine, neuro-trauma, neuro-oncology, peripheral nervous system)
+- Produces original surgical educational videos: GBM resection, endoscopic third ventriculostomy for hydrocephalus, trigeminal neuralgia balloon injections (parts 1 & 2)
+- Runs annual hands-on workshops for Residents, Fellows, and Nurse Practitioners since 2020
+- Is affiliated with Schulich School of Medicine, Western University, University of Windsor
+- Research contact: nera.windsor@gmail.com | Fellowship contact: Windsor.spinal.fellowship@gmail.com
+- Phone: 1-519-973-8771 ext. 225
+- Office: 1100 Ouellette Ave., Unit 300, Windsor, ON N9A 1C9
+- Donations: cheque payable to NERA, 1106 Ouellette Ave., Suite 103, Windsor ON N9A 1C9
+
+Physicians:
+- Dr. Abdurrahim Elashaal: MD, FRCS Ireland, FRCS Canada. Double Fellowship Toronto. Specialties: skull base, vascular, complex spinal, endoscopic pituitary surgery, trigeminal neuralgia, brain/spinal tumors, hydrocephalus, minimally invasive spinal surgery.
+- Dr. Abdalla Shamisa: Neurosurgeon
+- Dr. B. Jhawar: Neurosurgeon  
+- Dr. Erin Dyer: Neurosurgeon
+- Dr. Abdul Naeem: Locum, former fellow trained in London ON
+- Dr. Abdulhakim Mustafa: Neurologist
+- Windsor Regional Hospital also has 5 total neurologists + 2 stroke neurologists
+
+Answer questions about: NERA programs, neuroscience education, surgical procedures (GBM, ventriculostomy, trigeminal neuralgia), the fellowship, research opportunities, donations, physicians.
+IMPORTANT: Always clarify you provide general educational information only — never personal medical advice. Keep responses concise (2-4 sentences), warm, informative.`;
+
+let hist=[];
+async function sendChat(){
+  const inp=document.getElementById('chat-input'),msg=inp.value.trim();if(!msg)return;
+  addMsg(msg,'user');inp.value='';
+  document.getElementById('chat-send').disabled=true;showTyping(true);
+  hist.push({role:'user',content:msg});
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:SYS,messages:hist})});
+    const d=await r.json();
+    const reply=d.content?.[0]?.text||'I had trouble responding. Please contact NERA at nera.windsor@gmail.com or call 1-519-973-8771 ext. 225.';
+    hist.push({role:'assistant',content:reply});showTyping(false);addMsg(reply,'ai');
+  }catch(e){showTyping(false);addMsg('Connection issue. Please contact NERA at nera.windsor@gmail.com.','ai');}
+  document.getElementById('chat-send').disabled=false;
+}
+function addMsg(t,type){
+  const box=document.getElementById('chat-messages'),el=document.createElement('div');
+  el.className=`msg msg-${type}`;
+  el.innerHTML=type==='ai'?`<div class="msg-ai-label">NERA AI</div>${t}`:t;
+  box.appendChild(el);box.scrollTop=box.scrollHeight;
+}
+function showTyping(s){document.getElementById('typing').classList.toggle('active',s);document.getElementById('chat-messages').scrollTop=99999;}
+function askQuick(b){document.getElementById('chat-input').value=b.textContent;sendChat();}
+
+// ══════════════════════════════════════
+// CME PLATFORM
+// ══════════════════════════════════════
+const COURSES = [
+  {
+    category:'Neuro-Oncology',
+    title:'GBM Resection: Microscope, Navigation & Fluorescence',
+    instructor:'Dr. Abdurrahim Elashaal, MD FRCS',
+    credits:'3.5 CME Credits',
+    modules:[
+      {title:'Pathophysiology & Imaging of GBM',dur:'45 min',content:'Glioblastoma multiforme (GBM) is the most aggressive primary brain tumour. In this module we review WHO Grade IV classification, MRI characteristics, and how pre-operative imaging guides surgical planning.',quiz:{q:'Which MRI sequence is most useful for GBM surgical planning?',opts:['T1 without contrast','T2/FLAIR','DWI','MRS'],correct:1,explain:'T2/FLAIR best delineates the extent of edema and infiltration beyond the contrast-enhancing core.'}},
+      {title:'Intraoperative Navigation & Setup',dur:'55 min',content:'Frameless stereotactic neuronavigation is now standard for GBM resection. This module covers registration, accuracy verification, and adapting to brain shift during surgery.',quiz:{q:'Brain shift during GBM resection primarily affects:',opts:['Navigation accuracy','Anesthetic depth','Blood pressure','Antibiotic dosing'],correct:0,explain:'As CSF drains and brain relaxes, the actual anatomy diverges from pre-operative imaging, reducing navigation reliability.'}},
+      {title:'5-ALA Fluorescence-Guided Resection',dur:'60 min',content:'5-Aminolevulinic acid (5-ALA) causes tumour cells to accumulate fluorescent protoporphyrin IX, visible under violet light. This module demonstrates the Windsor technique for maximizing safe resection.',quiz:{q:'5-ALA fluorescence helps identify:',opts:['Eloquent cortex','Tumour margins','Venous sinuses','Arachnoid planes'],correct:1,explain:'5-ALA selectively accumulates in high-grade glioma cells, fluorescing pink-red under violet light to guide maximal safe resection.'}},
+      {title:'Closure, Post-Op Management & Outcomes',dur:'40 min',content:'Watertight dural closure, layered wound repair, and ICU protocols after GBM resection. We review NERA\'s outcomes data and adjuvant therapy sequencing.',quiz:{q:'First-line adjuvant therapy after GBM resection is:',opts:['Bevacizumab alone','Temozolomide + radiotherapy','Immunotherapy','Observation'],correct:1,explain:'The Stupp protocol — concurrent temozolomide and radiation followed by adjuvant temozolomide — remains standard of care.'}},
+    ]
+  },
+  {
+    category:'Endoscopic Neurosurgery',
+    title:'Endoscopic Third Ventriculostomy for Hydrocephalus',
+    instructor:'Dr. Abdurrahim Elashaal, MD FRCS',
+    credits:'2.5 CME Credits',
+    modules:[
+      {title:'Hydrocephalus: Classification & Patient Selection',dur:'40 min',content:'ETV is most effective for obstructive hydrocephalus. This module covers ETV Success Score (ETVSS), patient age, etiology, and prior shunt history as selection criteria.',quiz:{q:'ETV is MOST appropriate for:',opts:['Communicating hydrocephalus','Aqueductal stenosis','Choroid plexus papilloma','Normal pressure hydrocephalus'],correct:1,explain:'Aqueductal stenosis causes obstructive hydrocephalus — the ideal indication for ETV, bypassing the obstruction.'}},
+      {title:'Surgical Technique: Endoscope Navigation to the Third Ventricle',dur:'55 min',content:'Step-by-step approach: burr hole placement, endoscope trajectory, identification of the foramen of Monro, choroid plexus, mammillary bodies, and the correct perforation site.',quiz:{q:'The ETV fenestration is made in the:',opts:['Septum pellucidum','Floor of the third ventricle','Roof of the lateral ventricle','Aqueduct of Sylvius'],correct:1,explain:'A perforation is made in the thin floor of the third ventricle, anterior to the mammillary bodies, creating a bypass to the prepontine cistern.'}},
+      {title:'Complications & Long-Term Follow-Up',dur:'35 min',content:'ETV failure, CSF leak, basilar artery injury, and late closure. NERA\'s follow-up protocol and when to convert to VP shunt.',quiz:{q:'The most feared acute complication of ETV is:',opts:['Infection','Bleeding from basilar artery','Seizure','Headache'],correct:1,explain:'The basilar artery lies just below the third ventricular floor — inadvertent perforation can cause catastrophic hemorrhage.'}},
+    ]
+  },
+  {
+    category:'Pain Neurosurgery',
+    title:'Trigeminal Neuralgia: Percutaneous Balloon Microcompression',
+    instructor:'Dr. Abdurrahim Elashaal, MD FRCS',
+    credits:'3 CME Credits',
+    modules:[
+      {title:'Trigeminal Neuralgia: Diagnosis & Management Algorithm',dur:'45 min',content:'TN is characterized by unilateral electric shock-like facial pain along trigeminal branches. Diagnostic criteria, pharmacotherapy (carbamazepine, oxcarbazepine), and when to refer for surgery.',quiz:{q:'First-line pharmacotherapy for trigeminal neuralgia is:',opts:['Gabapentin','Carbamazepine','Amitriptyline','Prednisone'],correct:1,explain:'Carbamazepine (Tegretol) is the evidence-based first-line treatment for classic TN, acting on sodium channels.'}},
+      {title:'Meckel\'s Cave Anatomy & Fluoroscopic Guidance',dur:'50 min',content:'Understanding the trigeminal ganglion\'s location in Meckel\'s cave, foramen ovale cannulation technique, and live fluoroscopic guidance used at Windsor Regional Hospital.',quiz:{q:'The needle for percutaneous procedures enters through the:',opts:['Foramen spinosum','Foramen ovale','Foramen rotundum','Internal auditory meatus'],correct:1,explain:'The foramen ovale provides direct access to Meckel\'s cave and the Gasserian ganglion for percutaneous procedures.'}},
+      {title:'Balloon Inflation, Endpoints & Outcomes',dur:'40 min',content:'Correct balloon volume (0.5–1.0 mL), pear-shaped configuration, compression time, and expected sensory outcomes. Comparison with microvascular decompression and radiosurgery.',quiz:{q:'The target configuration of the inflated balloon is:',opts:['Spherical','Pear-shaped','Cylindrical','Irregular'],correct:1,explain:'A pear-shaped balloon confirms correct positioning in Meckel\'s cave, ensuring adequate compression of the Gasserian ganglion.'}},
+      {title:'Complication Avoidance & Recurrence Management',dur:'25 min',content:'Masticatory weakness, anesthesia dolorosa, recurrence rates, and repeat procedures. When to refer for MVD in younger patients.',quiz:{q:'The most common side effect of balloon microcompression is:',opts:['Corneal anesthesia','Masticatory weakness','Diplopia','Hearing loss'],correct:1,explain:'Temporary masseter weakness occurs due to motor root compression but typically resolves within weeks.'}},
+    ]
+  },
+  {
+    category:'Spine Surgery',
+    title:'Minimally Invasive Spine Surgery: Core Principles',
+    instructor:'NERA Faculty',
+    credits:'4 CME Credits',
+    modules:[
+      {title:'MISS Philosophy & Patient Selection',dur:'40 min',content:'MISS reduces collateral muscle damage vs open surgery. Patient selection, imaging review, and understanding when MISS is contraindicated.',quiz:{q:'A relative contraindication to MISS is:',opts:['Single-level disc herniation','Severe osteoporosis','Contained disc prolapse','Foraminal stenosis'],correct:1,explain:'Severe osteoporosis compromises pedicle screw purchase, making minimally invasive instrumentation risky.'}},
+      {title:'Lumbar Microdiscectomy Technique',dur:'55 min',content:'Tubular retractor setup, microscope positioning, flavotomy, root retraction, disc fragment removal. The Windsor approach to reducing revision rates.',quiz:{q:'Epidural hematoma after microdiscectomy most commonly presents with:',opts:['Fever','Acute worsening neurological deficit','Wound dehiscence','Urinary retention alone'],correct:1,explain:'An expanding epidural hematoma compresses neural elements, causing acute — often dramatic — neurological deterioration requiring emergent re-exploration.'}},
+      {title:'Percutaneous Pedicle Screw Instrumentation',dur:'60 min',content:'Fluoroscopic vs navigated screw placement, entry point identification, screw trajectory, and rod insertion through percutaneous stab incisions.',quiz:{q:'The ideal pedicle screw trajectory in the lumbar spine is:',opts:['Straight anterior','Medially convergent','Laterally divergent','Parallel to endplate'],correct:1,explain:'Medially convergent trajectories maximize bone purchase through the pedicle isthmus and into the vertebral body.'}},
+      {title:'TLIF & MIS Fusion Principles',dur:'50 min',content:'Transforaminal lumbar interbody fusion via MIS approach: cage sizing, graft preparation, Kambin\'s triangle access, and fusion biology.',quiz:{q:'Kambin\'s triangle is bordered by:',opts:['Exiting root, endplate, and traversing root','Pedicle, facet, and disc','Dura, nerve root, and posterior wall','Ligamentum flavum, facet, and lamina'],correct:0,explain:'Kambin\'s triangle is the safe working zone for posterolateral disc access, bounded by the exiting nerve root, inferior endplate, and traversing root.'}},
+      {title:'Outcomes, Complications & Post-Op Rehab',dur:'35 min',content:'NERA\'s MISS outcomes data, wound complications, screw malposition management, and return-to-activity protocols.',quiz:{q:'MIS approaches vs open surgery show:',opts:['Higher blood loss','Equivalent infection rates','Reduced muscle damage markers','Longer hospital stays'],correct:2,explain:'MIS approaches consistently show reduced CK and other muscle damage biomarkers compared to open surgery, correlating with faster recovery.'}},
+    ]
+  }
+];
+
+let currentCourse=null, moduleProgress={};
+
+function openCourse(idx){
+  currentCourse=idx;
+  moduleProgress={};
+  const c=COURSES[idx];
+  document.getElementById('modal-category').textContent=c.category;
+  document.getElementById('modal-title').textContent=c.title;
+  document.getElementById('modal-instructor').textContent='Instructor: '+c.instructor;
+  document.getElementById('modal-credits').textContent='🏅 '+c.credits;
+  document.getElementById('modal-progress-text').textContent='0% Complete';
+  document.getElementById('modal-progress-bar').style.width='0%';
+  document.getElementById('cert-section').style.display='none';
+
+  const modList=document.getElementById('modal-modules');
+  modList.innerHTML='';
+  c.modules.forEach((m,i)=>{
+    const el=document.createElement('div');
+    el.className='course-module';
+    el.id=`mod-${i}`;
+    el.innerHTML=`
+      <div class="course-module-header" onclick="toggleModule(${i})">
+        <div class="course-module-num">0${i+1}</div>
+        <div class="course-module-title">${m.title}</div>
+        <div class="course-module-dur">${m.dur}</div>
+        <div class="course-module-status" id="mod-status-${i}"></div>
+      </div>
+      <div class="course-module-content" id="mod-content-${i}">
+        <p>${m.content}</p>
+        <div class="quiz-area">
+          <div class="quiz-question">🧠 Knowledge Check: ${m.quiz.q}</div>
+          <div class="quiz-options">${m.quiz.opts.map((o,j)=>`<div class="quiz-option" onclick="answerQuiz(${i},${j})" id="qopt-${i}-${j}">${o}</div>`).join('')}</div>
+          <div class="quiz-feedback" id="qfb-${i}" style="display:none;"></div>
+        </div>
+      </div>`;
+    modList.appendChild(el);
+  });
+  document.getElementById('course-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function toggleModule(i){
+  const c=document.getElementById(`mod-content-${i}`);
+  c.classList.toggle('open');
+}
+
+function answerQuiz(modIdx,optIdx){
+  const c=COURSES[currentCourse];
+  const q=c.modules[modIdx].quiz;
+  if(moduleProgress[modIdx]) return;
+  document.querySelectorAll(`[id^="qopt-${modIdx}-"]`).forEach(el=>el.classList.remove('selected'));
+  document.getElementById(`qopt-${modIdx}-${optIdx}`).classList.add('selected');
+  const fb=document.getElementById(`qfb-${modIdx}`);
+  fb.style.display='block';
+  if(optIdx===q.correct){
+    document.getElementById(`qopt-${modIdx}-${optIdx}`).classList.add('correct');
+    fb.className='quiz-feedback correct'; fb.textContent='✓ Correct! '+q.explain;
+    moduleProgress[modIdx]=true;
+  } else {
+    document.getElementById(`qopt-${modIdx}-${optIdx}`).classList.add('wrong');
+    document.getElementById(`qopt-${modIdx}-${q.correct}`).classList.add('correct');
+    fb.className='quiz-feedback wrong'; fb.textContent='✗ Not quite. '+q.explain;
+    moduleProgress[modIdx]=true;
+  }
+  const status=document.getElementById(`mod-status-${modIdx}`);
+  status.classList.add('done'); status.textContent='✓';
+  updateProgress();
+}
+
+function updateProgress(){
+  const total=COURSES[currentCourse].modules.length;
+  const done=Object.keys(moduleProgress).length;
+  const pct=Math.round((done/total)*100);
+  document.getElementById('modal-progress-bar').style.width=pct+'%';
+  document.getElementById('modal-progress-text').textContent=pct+'% Complete';
+  if(done===total) document.getElementById('cert-section').style.display='block';
+}
+
+function closeCourse(){
+  document.getElementById('course-modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function downloadCert(){
+  const c=COURSES[currentCourse];
+  alert(`Certificate for "${c.title}" would download as PDF.\n\nIn production: generated with physician name, date, and CME credit hours.`);
+}
+
+function showCMETab(tab,el){
+  document.querySelectorAll('.cme-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  // All courses visible in demo; production would filter
+}
+
+// ══════════════════════════════════════
+// FELLOWSHIP APPLICATION PORTAL
+// ══════════════════════════════════════
+let applyCurrentStep=1;
+const APPLY_TOTAL=4;
+
+function applyNext(){
+  if(applyCurrentStep<APPLY_TOTAL){
+    if(applyCurrentStep===APPLY_TOTAL-1) buildReview();
+    setApplyStep(applyCurrentStep+1);
+  }
+}
+function applyPrev(){
+  if(applyCurrentStep>1) setApplyStep(applyCurrentStep-1);
+}
+function setApplyStep(s){
+  document.getElementById(`apply-step-${applyCurrentStep}`).classList.remove('active');
+  document.getElementById(`step-tab-${applyCurrentStep}`).classList.remove('active');
+  document.getElementById(`step-tab-${applyCurrentStep}`).classList.add('done');
+  applyCurrentStep=s;
+  document.getElementById(`apply-step-${s}`).classList.add('active');
+  document.getElementById(`step-tab-${s}`).classList.add('active');
+  document.getElementById('step-counter').textContent=`Step ${s} of ${APPLY_TOTAL}`;
+  document.getElementById('btn-prev').style.display=s>1?'':'none';
+  document.getElementById('btn-next').style.display=s<APPLY_TOTAL?'':'none';
+  document.getElementById('btn-submit').style.display=s===APPLY_TOTAL?'':'none';
+}
+function buildReview(){
+  const first=document.getElementById('f-first').value||'—';
+  const last=document.getElementById('f-last').value||'—';
+  const email=document.getElementById('f-email').value||'—';
+  const inst=document.getElementById('f-institution').value||'—';
+  const exp=document.getElementById('f-exp').value||'—';
+  document.getElementById('review-summary').innerHTML=`
+    <strong style="color:var(--white)">Reviewing your application:</strong><br><br>
+    Name: <span style="color:var(--white)">${first} ${last}</span><br>
+    Email: <span style="color:var(--white)">${email}</span><br>
+    Institution: <span style="color:var(--white)">${inst}</span><br>
+    Experience: <span style="color:var(--white)">${exp}</span><br><br>
+    <span style="color:var(--cyan)">Please confirm all details are correct before submitting.</span>`;
+}
+function submitApplication(){
+  if(!document.getElementById('f-agree').checked){
+    alert('Please confirm the declaration before submitting.'); return;
+  }
+  document.getElementById('apply-form-body').style.display='none';
+  document.getElementById('apply-steps').style.display='none';
+  document.getElementById('apply-form-footer').style.display='none';
+  document.getElementById('apply-success').classList.add('show');
+  const ref='NERA-'+new Date().getFullYear()+'-'+Math.floor(Math.random()*90000+10000);
+  document.getElementById('apply-ref-num').textContent='Reference: '+ref;
+}
+function toggleSpecialty(el){
+  el.closest('.specialty-opt').classList.toggle('checked',el.checked);
+}
+function handleFile(inp,listId){
+  const list=document.getElementById(listId);
+  list.innerHTML='';
+  Array.from(inp.files).forEach(f=>{
+    const item=document.createElement('div');
+    item.className='file-item';
+    item.innerHTML=`<span>📎</span> ${f.name} <span style="margin-left:auto">${(f.size/1024).toFixed(0)} KB</span>`;
+    list.appendChild(item);
+  });
+}
+</script>
+</body>
+</html>
